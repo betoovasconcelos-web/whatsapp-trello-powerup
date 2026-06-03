@@ -41,18 +41,29 @@ def generate():
         except ValueError:
             speed_ms = 40
 
+    font_name  = data.get("font", "arial").strip().lower()
+
     buf = io.BytesIO()
 
     from PIL import Image, ImageDraw, ImageFont
+    import os
 
-    FONT_PATHS = [
-        "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
-        "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf",
-        "/usr/share/fonts/truetype/freefont/FreeSansBold.ttf",
-    ]
+    _BASE = os.path.dirname(__file__)
+
+    FONT_MAP = {
+        "arial":      ["/System/Library/Fonts/Supplemental/Arial Bold.ttf",
+                       "/System/Library/Fonts/Supplemental/Arial.ttf"],
+        "montserrat": [os.path.join(_BASE, "fonts", "Montserrat-Bold.ttf")],
+        "roboto":     [os.path.join(_BASE, "fonts", "Roboto-Bold.ttf")],
+        "comic_sans": ["/System/Library/Fonts/Supplemental/Comic Sans MS Bold.ttf",
+                       "/System/Library/Fonts/Supplemental/Comic Sans MS.ttf"],
+        "impact":     ["/System/Library/Fonts/Supplemental/Impact.ttf"],
+        "georgia":    ["/System/Library/Fonts/Supplemental/Georgia Bold.ttf",
+                       "/System/Library/Fonts/Supplemental/Georgia.ttf"],
+    }
 
     font = None
-    for path in FONT_PATHS:
+    for path in FONT_MAP.get(font_name, FONT_MAP["arial"]):
         try:
             font = ImageFont.truetype(path, font_size)
             break
