@@ -61,6 +61,8 @@ def generate():
     if font is None:
         font = ImageFont.load_default()
 
+    gap        = int(data.get("gap", 60))
+
     dummy = Image.new("RGB", (1, 1))
     draw  = ImageDraw.Draw(dummy)
     bbox  = draw.textbbox((0, 0), text, font=font)
@@ -68,14 +70,20 @@ def generate():
     text_h = bbox[3] - bbox[1]
     text_y = (height - text_h) // 2 - bbox[1]
 
-    total_travel = width + text_w
+    # step = largura de uma repetição (texto + espaço)
+    step = text_w + gap
     gif_frames = []
 
     for i in range(frames):
-        x = width - int(i / (frames - 1) * total_travel)
+        # offset avança 1 step completo ao longo dos frames (loop perfeito)
+        offset = int(i / frames * step)
         img = Image.new("RGB", (width, height), bg_color)
         d   = ImageDraw.Draw(img)
-        d.text((x, text_y), text, font=font, fill=text_color)
+        # desenha cópias suficientes para cobrir toda a largura
+        x = -offset
+        while x < width:
+            d.text((x, text_y), text, font=font, fill=text_color)
+            x += step
         gif_frames.append(img.convert("P", palette=Image.ADAPTIVE))
 
     gif_frames[0].save(
