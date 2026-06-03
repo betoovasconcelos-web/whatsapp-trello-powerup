@@ -245,6 +245,12 @@
       <input type="number" id="frames" value="60" min="10" max="200" />
     </div>
 
+    <!-- Espaço entre repetições -->
+    <div class="full">
+      <label>Espaço entre repetições (px)</label>
+      <input type="number" id="gap" value="60" min="0" max="600" />
+    </div>
+
     <!-- Cores -->
     <div>
       <label>Cor do texto</label>
@@ -321,6 +327,7 @@
       height:     document.getElementById("height").value,
       font_size:  document.getElementById("font_size").value,
       frames:     document.getElementById("frames").value,
+      gap:        document.getElementById("gap").value,
       text_color: document.getElementById("textColorHex").value,
       bg_color:   document.getElementById("bgColorHex").value,
     };
