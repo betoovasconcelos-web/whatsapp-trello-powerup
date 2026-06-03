@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Banner GIF Generator</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #0f0f13;
+      color: #e2e2e2;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .card {
+      background: #1a1a24;
+      border: 1px solid #2e2e42;
+      border-radius: 16px;
+      padding: 36px 40px;
+      width: 100%;
+      max-width: 620px;
+      box-shadow: 0 24px 64px rgba(0,0,0,.5);
+    }
+
+    h1 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      letter-spacing: .5px;
+      margin-bottom: 28px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    h1 span.dot { width: 10px; height: 10px; border-radius: 50%; background: #6c63ff; display:inline-block; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px 24px;
+    }
+    .full { grid-column: 1 / -1; }
+
+    label {
+      display: block;
+      font-size: .78rem;
+      font-weight: 600;
+      color: #9090b0;
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      margin-bottom: 6px;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    select {
+      width: 100%;
+      background: #111118;
+      border: 1px solid #2e2e42;
+      border-radius: 8px;
+      color: #e2e2e2;
+      font-size: .95rem;
+      padding: 10px 12px;
+      outline: none;
+      transition: border-color .2s;
+    }
+    input:focus, select:focus { border-color: #6c63ff; }
+
+    .color-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    input[type="color"] {
+      width: 42px;
+      height: 38px;
+      border: 1px solid #2e2e42;
+      border-radius: 8px;
+      background: none;
+      cursor: pointer;
+      padding: 2px;
+      flex-shrink: 0;
+    }
+    input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; border-radius: 6px; }
+    input[type="color"]::-webkit-color-swatch { border: none; border-radius: 6px; }
+    .color-row input[type="text"] { font-family: monospace; font-size: .85rem; }
+
+    .speed-group {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+    .speed-btn {
+      background: #111118;
+      border: 1px solid #2e2e42;
+      border-radius: 8px;
+      color: #9090b0;
+      font-size: .8rem;
+      font-weight: 600;
+      padding: 9px 6px;
+      cursor: pointer;
+      text-align: center;
+      transition: all .15s;
+      user-select: none;
+    }
+    .speed-btn:hover { border-color: #6c63ff; color: #c0b8ff; }
+    .speed-btn.active { background: #6c63ff22; border-color: #6c63ff; color: #c0b8ff; }
+
+    .custom-speed {
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .custom-speed label { margin: 0; white-space: nowrap; }
+    #customSpeedInput { width: 80px; }
+
+    .btn-generate {
+      width: 100%;
+      margin-top: 28px;
+      padding: 14px;
+      background: #6c63ff;
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: .4px;
+      cursor: pointer;
+      transition: background .2s, transform .1s;
+    }
+    .btn-generate:hover { background: #5a52e0; }
+    .btn-generate:active { transform: scale(.98); }
+    .btn-generate:disabled { background: #3a3a52; color: #666; cursor: not-allowed; }
+
+    .preview-area {
+      margin-top: 28px;
+      display: none;
+    }
+    .preview-area h2 {
+      font-size: .78rem;
+      font-weight: 600;
+      color: #9090b0;
+      text-transform: uppercase;
+      letter-spacing: .6px;
+      margin-bottom: 10px;
+    }
+    .preview-box {
+      border: 1px solid #2e2e42;
+      border-radius: 10px;
+      overflow: hidden;
+      background: #111118;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 60px;
+    }
+    .preview-box img { display: block; image-rendering: pixelated; }
+
+    .btn-download {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      margin-top: 12px;
+      padding: 11px;
+      background: #111118;
+      border: 1px solid #2e2e42;
+      border-radius: 10px;
+      color: #c0b8ff;
+      font-size: .9rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: border-color .2s;
+    }
+    .btn-download:hover { border-color: #6c63ff; }
+
+    .spinner {
+      display: inline-block;
+      width: 18px; height: 18px;
+      border: 2px solid #ffffff44;
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+<div class="card">
+  <h1><span class="dot"></span> Banner GIF Generator</h1>
+
+  <div class="grid">
+
+    <!-- Texto -->
+    <div class="full">
+      <label>Texto</label>
+      <input type="text" id="text" value="SALES" placeholder="Ex: BLACK FRIDAY" maxlength="60" />
+    </div>
+
+    <!-- Velocidade -->
+    <div class="full">
+      <label>Velocidade</label>
+      <div class="speed-group">
+        <div class="speed-btn" data-value="lento">Lento</div>
+        <div class="speed-btn active" data-value="normal">Normal</div>
+        <div class="speed-btn" data-value="rapido">Rápido</div>
+        <div class="speed-btn" data-value="muito_rapido">Turbo</div>
+      </div>
+      <div class="custom-speed">
+        <label for="customSpeedInput" style="color:#9090b0;font-size:.78rem;font-weight:600;text-transform:uppercase;letter-spacing:.6px;">
+          Personalizado (ms/frame):
+        </label>
+        <input type="number" id="customSpeedInput" min="1" max="500" placeholder="ex: 30" />
+      </div>
+    </div>
+
+    <!-- Dimensões -->
+    <div>
+      <label>Largura (px)</label>
+      <input type="number" id="width" value="600" min="100" max="2000" />
+    </div>
+    <div>
+      <label>Altura (px)</label>
+      <input type="number" id="height" value="40" min="20" max="400" />
+    </div>
+
+    <!-- Fonte e Frames -->
+    <div>
+      <label>Tamanho da fonte</label>
+      <input type="number" id="font_size" value="28" min="8" max="200" />
+    </div>
+    <div>
+      <label>Nº de frames</label>
+      <input type="number" id="frames" value="60" min="10" max="200" />
+    </div>
+
+    <!-- Cores -->
+    <div>
+      <label>Cor do texto</label>
+      <div class="color-row">
+        <input type="color" id="textColorPicker" value="#ffffff" />
+        <input type="text"  id="textColorHex"    value="#ffffff" maxlength="7" />
+      </div>
+    </div>
+    <div>
+      <label>Cor de fundo</label>
+      <div class="color-row">
+        <input type="color" id="bgColorPicker" value="#000000" />
+        <input type="text"  id="bgColorHex"    value="#000000" maxlength="7" />
+      </div>
+    </div>
+
+  </div><!-- /grid -->
+
+  <button class="btn-generate" id="generateBtn" onclick="generate()">Gerar Banner</button>
+
+  <div class="preview-area" id="previewArea">
+    <h2>Preview</h2>
+    <div class="preview-box">
+      <img id="previewImg" src="" alt="banner preview" />
+    </div>
+    <a class="btn-download" id="downloadBtn" href="#" download="">
+      ⬇ Download GIF
+    </a>
+  </div>
+</div>
+
+<script>
+  /* ── Velocidade ── */
+  let selectedSpeed = "normal";
+
+  document.querySelectorAll(".speed-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".speed-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      selectedSpeed = btn.dataset.value;
+      document.getElementById("customSpeedInput").value = "";
+    });
+  });
+
+  document.getElementById("customSpeedInput").addEventListener("input", e => {
+    if (e.target.value) {
+      document.querySelectorAll(".speed-btn").forEach(b => b.classList.remove("active"));
+      selectedSpeed = e.target.value;
+    }
+  });
+
+  /* ── Sincronizar color picker ↔ hex input ── */
+  function syncColor(pickerId, hexId) {
+    const picker = document.getElementById(pickerId);
+    const hex    = document.getElementById(hexId);
+    picker.addEventListener("input", () => hex.value = picker.value);
+    hex.addEventListener("input", () => {
+      if (/^#[0-9a-fA-F]{6}$/.test(hex.value)) picker.value = hex.value;
+    });
+  }
+  syncColor("textColorPicker", "textColorHex");
+  syncColor("bgColorPicker",   "bgColorHex");
+
+  /* ── Gerar ── */
+  async function generate() {
+    const btn = document.getElementById("generateBtn");
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Gerando...';
+
+    const payload = {
+      text:       document.getElementById("text").value,
+      speed:      selectedSpeed,
+      width:      document.getElementById("width").value,
+      height:     document.getElementById("height").value,
+      font_size:  document.getElementById("font_size").value,
+      frames:     document.getElementById("frames").value,
+      text_color: document.getElementById("textColorHex").value,
+      bg_color:   document.getElementById("bgColorHex").value,
+    };
+
+    try {
+      const res  = await fetch("/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+
+      const src = "data:image/gif;base64," + data.gif;
+      document.getElementById("previewImg").src = src;
+      document.getElementById("downloadBtn").href     = src;
+      document.getElementById("downloadBtn").download = data.filename;
+      document.getElementById("previewArea").style.display = "block";
+    } catch (err) {
+      alert("Erro ao gerar o banner: " + err.message);
+    } finally {
+      btn.disabled = false;
+      btn.innerHTML = "Gerar Banner";
+    }
+  }
+</script>
+</body>
+</html>
